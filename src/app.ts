@@ -1,14 +1,17 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express, { Express } from 'express';
+import express, { Express, Request, Response } from 'express';
 import routes from './routes';
 
 const app: Express = express();
 
 const PORT = process.env.PORT;
 
-app.use('/api/v1', routes);
+app.use('/', routes);
+app.get('*', (_req: Request, res: Response) => {
+  res.send(`<h1>Page not found <a href="/">Go back home</a></h1>`);
+});
 
 app.listen(PORT, function () {
   console.log('server started');

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import path from 'path';
-import sharp from 'sharp';
 import checkFile from '../../utils/checkFile';
 import isImageValidOrExist from '../../utils/imageValid';
+import resizeImage from '../../utils/resizeImage';
 // import checkFile from '../../../utils/checkFile';
 // import isImageValidOrExist from '../../../utils/imageValid';
 
@@ -28,12 +28,14 @@ async function processImage(req: Request, res: Response): Promise<void> {
 
     const fullPath: string = path.resolve('images', `${filename}.jpg`);
     const isValidImage: boolean = await isImageValidOrExist(`${filename}.jpg`);
+
+    // checking if file exist or invalid file
     if (!isValidImage) {
       throw new Error('<h1>File doest not exist or invalid</h1>');
     }
-    console.log(fullPath);
-    const image = await sharp(fullPath).resize(parseInt(width), parseInt(height)).toFile(thumbnailPath);
-    console.log(image);
+
+    const image = await resizeImage(fullPath, width, height, thumbnailPath);
+
     if (image) {
       res.sendFile(thumbnailPath);
     }
