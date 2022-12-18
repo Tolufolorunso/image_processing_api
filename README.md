@@ -32,7 +32,7 @@ npm install
 ## Endpoints
 
 - homepage: <http://localhost:3003>
-- Resizing Image: <http://localhost:3003/images?filename=fjord&width=400&height=400>
+- Other links are on homepage
 
 ## Notes
 

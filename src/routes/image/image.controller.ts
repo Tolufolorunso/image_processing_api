@@ -16,7 +16,20 @@ async function processImage(req: Request, res: Response): Promise<void> {
   try {
     const { filename, width, height }: Query = req.query;
     if (!filename || !width || !height) {
-      throw new Error('<h1>Query not complete</h1>');
+      throw new Error(`<div>
+        <h1>Query not complete</h1>
+          <p>
+            Filaname, height, and width are all required. url sample: http://localhost:3003/images?filename=palmtunnel&width=400&height=400
+          </p>
+          <div>
+      <h2>Image processing API</h2>
+      <h2>Links </h2>
+      <h2><a href="http://localhost:3003">HomePage</a></h2>
+      <h2><a href="http://localhost:3003/images?filename=palmtunnel&width=400&height=400">Resizing image</a></h2>
+      <h2><a href="http://localhost:3003/images">This will result to error</a></h2>
+      <h2><a href="http://localhost:3003/images?filename=palmtunne&width=400&height=400">This will result to error: invalid file or file doesn't exists</a></h2>
+    </div>
+        </div>`);
     }
 
     const thumbnailPath = path.resolve('uploads', `${width}-${height}-${filename}.jpg`);
@@ -31,7 +44,22 @@ async function processImage(req: Request, res: Response): Promise<void> {
 
     // checking if file exist or invalid file
     if (!isValidImage) {
-      throw new Error('<h1>File doest not exist or invalid</h1>');
+      throw new Error(
+        `
+        <div>
+        <div>
+         <h1> File doest not exist or invalid file </h1>
+        <div>
+      <h2>Image processing API</h2>
+      <h2>Links </h2>
+      <h2><a href="http://localhost:3003">HomePage</a></h2>
+      <h2><a href="http://localhost:3003/images?filename=palmtunnel&width=400&height=400">Resizing image</a></h2>
+      <h2><a href="http://localhost:3003/images">This will result to error</a></h2>
+      <h2><a href="http://localhost:3003/images?filename=palmtunne&width=400&height=400">This will result to error: invalid file or file doesn't exists</a></h2>
+    </div>
+        </>
+        `,
+      );
     }
 
     const image = await resizeImage(fullPath, width, height, thumbnailPath);

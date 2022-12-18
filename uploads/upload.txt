@@ -1,0 +1,1 @@
+thumbnail will be stored here in uploads folder
