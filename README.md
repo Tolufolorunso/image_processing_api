@@ -27,7 +27,7 @@ npm install
 - Run jasmine text: `npm run jasmine`
 - Run test and build: `npm test`
 - Linting: `npm run lint`
-- Format code: `npm run format`
+- Format code using prettier: `npm run format`
 
 ## Endpoints
 

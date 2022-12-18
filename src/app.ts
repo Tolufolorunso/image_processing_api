@@ -10,7 +10,7 @@ const PORT = process.env.PORT;
 
 app.use('/', routes);
 app.get('*', (_req: Request, res: Response) => {
-  res.send(`<h1>Page not found <a href="/">Go back home</a></h1>`);
+  res.status(404).send(`<h1>Page not found <a href="/">Go back home</a></h1>`);
 });
 
 app.listen(PORT, function () {
