@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import checkFile from '../../utils/checkFile';
 import isImageValidOrExist from '../../utils/imageValid';
 import resizeImage from '../../utils/resizeImage';
+import { CustomError } from '../../middleware/globalErrorHandler';
 // import checkFile from '../../../utils/checkFile';
 // import isImageValidOrExist from '../../../utils/imageValid';
 
@@ -12,28 +13,51 @@ interface Query {
   height?: string;
 }
 
-async function processImage(req: Request, res: Response): Promise<void> {
+async function processImage(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { filename, width, height }: Query = req.query;
-    if (!filename || !width || !height) {
-      throw new Error(`<div>
-        <h1>Query not complete</h1>
-          <p>
-            Filaname, height, and width are all required. url sample: http://localhost:3003/images?filename=palmtunnel&width=400&height=400
-          </p>
-          <div>
-      <h2>Image processing API</h2>
-      <h2>Links </h2>
-      <h2><a href="http://localhost:3003">HomePage</a></h2>
-      <h2><a href="http://localhost:3003/images?filename=palmtunnel&width=400&height=400">Resizing image</a></h2>
-      <h2><a href="http://localhost:3003/images">This will result to error</a></h2>
-      <h2><a href="http://localhost:3003/images?filename=palmtunne&width=400&height=400">This will result to error: invalid file or file doesn't exists</a></h2>
-    </div>
-        </div>`);
+
+    if (!filename) {
+      return next(
+        new CustomError(
+          400,
+          'Supply filename in the query parameter.  e.g.: `http://localhost:3003/images?filename=fjord&width=200&height=200`',
+        ),
+      );
     }
 
-    const thumbnailPath = path.resolve('uploads', `${width}-${height}-${filename}.jpg`);
-    const isFileExist: boolean = await checkFile(`${width}-${height}-${filename}.jpg`);
+    if (!width || !height) {
+      return next(
+        new CustomError(
+          400,
+          'Supply both width and height in the query parameter.  e.g.: `http://localhost:3003/images?filename=fjord&width=200&height=200`',
+        ),
+      );
+    }
+
+    const userWidth: number = parseInt(width);
+    const userHeight: number = parseInt(height);
+
+    if (isNaN(userHeight) || isNaN(userWidth)) {
+      return next(
+        new CustomError(
+          400,
+          'Width and Height must be a numeric value. EG. http://localhost:3003/images?filename=fjord&width=200&height=200',
+        ),
+      );
+    }
+
+    if (userHeight < 1 || userWidth < 1) {
+      return next(
+        new CustomError(
+          400,
+          'Width and Height must be greater than zero EG. http://localhost:3003/images?filename=fjord&width=200&height=200',
+        ),
+      );
+    }
+
+    const thumbnailPath = path.resolve('uploads', `${userWidth}-${userHeight}-${filename}.jpg`);
+    const isFileExist: boolean = await checkFile(`${userWidth}-${userHeight}-${filename}.jpg`);
 
     if (isFileExist) {
       return res.sendFile(thumbnailPath);
@@ -44,25 +68,10 @@ async function processImage(req: Request, res: Response): Promise<void> {
 
     // checking if file exist or invalid file
     if (!isValidImage) {
-      throw new Error(
-        `
-        <div>
-        <div>
-         <h1> File doest not exist or invalid file </h1>
-        <div>
-      <h2>Image processing API</h2>
-      <h2>Links </h2>
-      <h2><a href="http://localhost:3003">HomePage</a></h2>
-      <h2><a href="http://localhost:3003/images?filename=palmtunnel&width=400&height=400">Resizing image</a></h2>
-      <h2><a href="http://localhost:3003/images">This will result to error</a></h2>
-      <h2><a href="http://localhost:3003/images?filename=palmtunne&width=400&height=400">This will result to error: invalid file or file doesn't exists</a></h2>
-    </div>
-        </>
-        `,
-      );
+      return next(new CustomError(400, 'File doest not exist or invalid file'));
     }
 
-    const image = await resizeImage(fullPath, width, height, thumbnailPath);
+    const image = await resizeImage(fullPath, userWidth, userHeight, thumbnailPath);
 
     if (image) {
       res.sendFile(thumbnailPath);

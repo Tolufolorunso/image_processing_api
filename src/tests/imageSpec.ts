@@ -30,17 +30,17 @@ describe('Test responses from endpoints', (): void => {
       expect(response.status).toBe(400);
     });
 
-    it('should return status code 400, endpoint: "/api/v1/images', async (): Promise<void> => {
+    it('should return status code 400 if no parameters supplied, endpoint: "/images', async (): Promise<void> => {
       const response: supertest.Response = await request.get('/images');
       expect(response.status).toBe(400);
     });
   });
 
   describe('Test processing image using sharp', (): void => {
-    it('returns true', async (): Promise<void> => {
+    it('should return true if image is resized', async (): Promise<void> => {
       const fullPath: string = path.resolve('images', `fjord.jpg`);
       const thumbnailPath = path.resolve('uploads', `400-400-fjord.jpg`);
-      const isSuccess = await resizeImage(fullPath, '400', '400', thumbnailPath);
+      const isSuccess = await resizeImage(fullPath, 400, 400, thumbnailPath);
       expect(isSuccess).toBe(true);
     });
   });

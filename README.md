@@ -29,10 +29,11 @@ npm install
 - Linting: `npm run lint`
 - Format code using prettier: `npm run format`
 
-## Endpoints
+## Links
 
-- homepage: <http://localhost:3003>
-- Other links are on homepage
+- homepage: `http://localhost:3003`
+- Resizing Image: `http://localhost:3003/images`
+  - The resizing url needs the filename as parameter and the desired width and height as parameters, e.g.: `http://localhost:3003/images?filename=fjord&width=200&height=200`
 
 ## Notes
 
