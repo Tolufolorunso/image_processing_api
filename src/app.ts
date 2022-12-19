@@ -7,7 +7,7 @@ import { CustomError, globalErrorHandler } from './middleware/globalErrorHandler
 
 const app: Express = express();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3003;
 
 app.use('/', routes);
 app.get('*', (req: Request, _res: Response, next: NextFunction) => {
